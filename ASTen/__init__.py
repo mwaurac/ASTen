@@ -54,6 +54,8 @@ class Tensor:
     # View ops
     def view(self, shape):
         return Tensor(self._tensor.view(list(shape)))
+    def reshape(self, shape):
+        return Tensor(self._tensor.reshape(list(shape)))
 
 
 

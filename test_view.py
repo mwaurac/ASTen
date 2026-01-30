@@ -14,5 +14,6 @@ print("Viewed tensor shape:", t_view.shape)
 print("Viewed tensor: ", t_view.numpy())
 
 # Reshape to (3, 2)
-t_view2 = t_view.view([3, 2])
+t_view2 = t_view.reshape([1, 1, 1, 6])
 print("Viewed tensor shape:", t_view2.shape)
+print("Reshaped tensor:", t_view2.numpy())
