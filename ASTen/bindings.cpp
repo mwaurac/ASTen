@@ -6,6 +6,7 @@ extern "C" {
     #include "../c10/core/tensor.h"
     #include "../c10/core/dtype.h"
     #include "../c10/core/device.h"
+    #include "../aten/native/view_ops.h"
 }
 
 namespace py = pybind11;
@@ -125,5 +126,15 @@ PYBIND11_MODULE(_C, m) {
         
         .def_property("requires_grad", 
             [](const TensorWrapper& tw) { return tw.ptr->requires_grad; },
-            [](TensorWrapper& tw, bool req_grad) { tensor_set_requires_grad(tw.ptr, req_grad); });
+            [](TensorWrapper& tw, bool req_grad) {
+                tensor_set_requires_grad(tw.ptr, req_grad);
+        })
+        .def("view", [](const TensorWrapper& tw, py::object shape_obj) {
+            py::list shape_list = shape_obj.cast<py::list>();
+            std::vector<size_t> shape_vec(py::len(shape_list));
+            for (size_t i = 0; i < py::len(shape_list); ++i) {
+                shape_vec[i] = py::cast<size_t>(shape_list[i]);
+            }
+            return new TensorWrapper(tensor_view(tw.ptr, shape_vec.data(), shape_vec.size()));
+        }, py::arg("shape"));
 }

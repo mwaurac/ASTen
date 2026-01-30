@@ -51,6 +51,10 @@ class Tensor:
     def __repr__(self):
         return f"Tensor(shape={self.shape}, dtype={self.dtype})"
 
+    # View ops
+    def view(self, shape):
+        return Tensor(self._tensor.view(list(shape)))
+
 
 
 def tensor(data, dtype='float32', device='cpu', requires_grad=False):

@@ -122,18 +122,6 @@ size_t tensor_numel(Tensor* tensor) {
 
 int tensor_is_contiguous(Tensor *tensor) {
     if (!tensor) return 0;
-    fprintf(stderr, "tensor_is_contiguous: self = %p\n", (void*)tensor);
-    fprintf(stderr, "tensor_is_contiguous: self->ndim = %zu\n", tensor->ndim);
-    fprintf(stderr, "tensor_is_contiguous: self->shape = [");
-    for (size_t i = 0; i < tensor->ndim; i++) {
-        fprintf(stderr, "%zu%s", tensor->shape[i], (i == tensor->ndim - 1 ? "" : ", "));
-    }
-    fprintf(stderr, "]\n");
-    fprintf(stderr, "tensor_is_contiguous: self->strides = [");
-    for (size_t i = 0; i < tensor->ndim; i++) {
-        fprintf(stderr, "%zu%s", tensor->strides[i], (i == tensor->ndim - 1 ? "" : ", "));
-    }
-    fprintf(stderr, "]\n");
 
     size_t expected_stride = 1;
     for (int i = tensor->ndim - 1; i >= 0; i--) {

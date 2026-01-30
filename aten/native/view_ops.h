@@ -1,0 +1,7 @@
+#ifndef ATEN_VIEW_OPS_H
+#define ATEN_VIEW_OPS_H
+
+#include "../../c10/core/tensor.h"
+
+Tensor* tensor_view(Tensor* self, size_t* new_shape, size_t new_ndim);
+#endif
