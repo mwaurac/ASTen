@@ -57,6 +57,8 @@ class Tensor:
     def reshape(self, shape):
         return Tensor(self._tensor.reshape(list(shape)))
 
+    def permute(self, *dims):
+        return Tensor(self._tensor.permute(list(dims)))
 
 
 def tensor(data, dtype='float32', device='cpu', requires_grad=False):

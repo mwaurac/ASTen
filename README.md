@@ -3,7 +3,7 @@
 ASTen is a small, educational tensor library inspired by PyTorch. It is designed to help users understand the internal workings of the Pytorch framework by providing a simplified implementation of core components.
 
 ## Inspiration
-- After reading the Pytorch internals by ezyang, I was motivated to build a similar library. I wanted something simple but a reflection of Pytorch itself. I have been using AI to navigate through the pytorch codebase and also to debug my C/C++ code cause I am new to C and C++
+- After reading the Pytorch internals by ezyang, I was motivated to build a similar library. I wanted something simple but a reflection of Pytorch itself.
 
 ### Current Features
 - **Tensor:** A multi-dimensional array object.

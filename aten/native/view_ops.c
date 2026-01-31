@@ -99,3 +99,46 @@ Tensor* tensor_reshape(Tensor* self, size_t* new_shape, size_t new_ndim) {
     }
     return tensor_view(self, new_shape, new_ndim);
 }
+
+Tensor* tensor_permute(Tensor* self, size_t* dims, size_t ndim) {
+    if (!self || ndim != self->ndim) return NULL;
+
+    int* seen = (int*)calloc(ndim, sizeof(int));
+    for (size_t i = 0; i < ndim; i++) {
+        if (dims[i] >= ndim || seen[dims[i]]) {
+            free(seen);
+            return NULL;
+        }
+        seen[dims[i]] = 1;
+    }
+    free(seen);
+
+    Tensor* result = (Tensor*)malloc(sizeof(Tensor));
+    if (!result) return NULL;
+
+    result->storage = self->storage;
+    storage_retain(result->storage);
+
+    result->shape = (size_t*)malloc(ndim * sizeof(size_t));
+    result->strides = (size_t*)malloc(ndim * sizeof(size_t));
+
+    if (!result->shape ||!result->strides) {
+        storage_release(result->storage);
+        free(result->shape);
+        free(result->strides);
+        free(result);
+        return NULL;
+    }
+
+    for (size_t i = 0; i < ndim; i++) {
+        result->shape[i] = self->shape[dims[i]];
+        result->strides[i] = self->strides[dims[i]];
+    }
+
+    result->ndim = ndim;
+    result->offset = self->offset;
+    result->requires_grad = self->requires_grad;
+    result->autograd = NULL;
+
+    return result;
+}

@@ -17,3 +17,10 @@ print("Viewed tensor: ", t_view.numpy())
 t_view2 = t_view.reshape([1, 1, 1, 6])
 print("Viewed tensor shape:", t_view2.shape)
 print("Reshaped tensor:", t_view2.numpy())
+
+# test permute
+per_tensor = ASTen.Tensor([[1, 2], [3, 4], [5, 6]])
+print(per_tensor.shape)
+t_perm = per_tensor.permute(1, 0)
+print(t_perm.numpy())
+print(t_perm.shape)

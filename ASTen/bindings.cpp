@@ -117,6 +117,10 @@ PYBIND11_MODULE(_C, m) {
         .def("view", [](const TensorWrapper& tw, std::vector<size_t> shape) {
             return new TensorWrapper(tensor_view(tw.ptr, shape.data(), shape.size()));
         })
+        .def("permute", [](const TensorWrapper& tw, std::vector<size_t> dims) {
+            return new TensorWrapper(tensor_permute(tw.ptr, dims.data(), dims.size()));
+        })
+
         .def_property_readonly("shape", [](const TensorWrapper& tw) {
             std::vector<size_t> shape(tw.ptr->shape, tw.ptr->shape + tw.ptr->ndim);
             return shape;
