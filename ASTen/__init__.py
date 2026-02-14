@@ -59,6 +59,13 @@ class Tensor:
 
     def permute(self, *dims):
         return Tensor(self._tensor.permute(list(dims)))
+        
+    def __add__(self, other):
+        if isinstance(other, Tensor):
+            return Tensor(self._tensor.add(other._tensor))
+        elif isinstance(other, (int, float)):
+            raise NotImplementedError("Scalar addition not yet implemented")
+        return NotImplemented
 
 
 def tensor(data, dtype='float32', device='cpu', requires_grad=False):

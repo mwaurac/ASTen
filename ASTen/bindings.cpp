@@ -7,6 +7,7 @@ extern "C" {
     #include "../c10/core/dtype.h"
     #include "../c10/core/device.h"
     #include "../aten/native/view_ops.h"
+    #include "../aten/native/ops.h"
 }
 
 namespace py = pybind11;
@@ -14,19 +15,19 @@ namespace py = pybind11;
 class TensorWrapper {
 public:
     Tensor* ptr;
-    
+
     TensorWrapper(Tensor* t) : ptr(t) {
         if (ptr) tensor_retain(ptr);
     }
-    
+
     ~TensorWrapper() {
         if (ptr) tensor_release(ptr);
     }
-    
+
     TensorWrapper(const TensorWrapper& other) : ptr(other.ptr) {
         if (ptr) tensor_retain(ptr);
     }
-    
+
     TensorWrapper& operator=(const TensorWrapper& other) {
         if (this != &other) {
             if (ptr) tensor_release(ptr);
@@ -39,7 +40,7 @@ public:
 
 TensorWrapper* numpy_to_tensor(py::array arr, const std::string& device_str) {
     auto buf = arr.request();
-    
+
     DType dtype;
     if (buf.format == py::format_descriptor<float>::format()) {
         dtype = DTYPE_FLOAT32;
@@ -52,12 +53,12 @@ TensorWrapper* numpy_to_tensor(py::array arr, const std::string& device_str) {
     } else {
         throw std::runtime_error("Unsupported dtype");
     }
-    
+
     Device device = device_str == "cuda" ? device_cuda(0) : device_cpu();
-    
+
     std::vector<size_t> shape(buf.shape.begin(), buf.shape.end());
     Tensor* t = tensor_empty(shape.data(), shape.size(), dtype, device);
-    
+
     // Copy data
     if (device.type == DEVICE_CPU) {
         void* src = buf.ptr;
@@ -65,7 +66,7 @@ TensorWrapper* numpy_to_tensor(py::array arr, const std::string& device_str) {
         size_t size = storage_size_bytes(t->storage);
         memcpy(dst, src, size);
     }
-    
+
     return new TensorWrapper(t);
 }
 
@@ -74,17 +75,17 @@ py::array tensor_to_numpy(const TensorWrapper& tw) {
     if (!t || t->storage->device.type != DEVICE_CPU) {
         throw std::runtime_error("Can only convert CPU tensors to numpy");
     }
-    
+
     std::vector<ssize_t> shape(t->ndim);
     std::vector<ssize_t> strides(t->ndim);
-    
+
     for (size_t i = 0; i < t->ndim; i++) {
         shape[i] = t->shape[i];
         strides[i] = t->strides[i] * dtype_size(t->storage->dtype);
     }
-    
+
     void* data = storage_data(t->storage);
-    
+
     switch (t->storage->dtype) {
         case DTYPE_FLOAT32:
             return py::array_t<float>(shape, strides, (float*)data);
@@ -102,13 +103,13 @@ py::array tensor_to_numpy(const TensorWrapper& tw) {
 
 PYBIND11_MODULE(_C, m) {
     m.doc() = "ASTen C++ backend";
-    
+
     // Tensor class
     py::class_<TensorWrapper>(m, "Tensor")
         .def(py::init([](py::array arr, const std::string& device_str) {
             return numpy_to_tensor(arr, device_str);
         }), py::arg("data"), py::arg("device") = "cpu")
-        
+
         .def("numpy", &tensor_to_numpy)
 
         .def("reshape", [](const TensorWrapper& tw, std::vector<size_t> shape) {
@@ -120,21 +121,26 @@ PYBIND11_MODULE(_C, m) {
         .def("permute", [](const TensorWrapper& tw, std::vector<size_t> dims) {
             return new TensorWrapper(tensor_permute(tw.ptr, dims.data(), dims.size()));
         })
+        
+        // Operations
+        .def("add", [](const TensorWrapper& a, const TensorWrapper& b) {
+            return new TensorWrapper(tensor_add(a.ptr, b.ptr));
+        })
 
         .def_property_readonly("shape", [](const TensorWrapper& tw) {
             std::vector<size_t> shape(tw.ptr->shape, tw.ptr->shape + tw.ptr->ndim);
             return shape;
         })
-        
+
         .def_property_readonly("ndim", [](const TensorWrapper& tw) {
             return tw.ptr->ndim;
         })
-        
+
         .def_property_readonly("dtype", [](const TensorWrapper& tw) {
             return std::string(dtype_name(tw.ptr->storage->dtype));
         })
-        
-        .def_property("requires_grad", 
+
+        .def_property("requires_grad",
             [](const TensorWrapper& tw) { return tw.ptr->requires_grad; },
             [](TensorWrapper& tw, bool req_grad) {
                 tensor_set_requires_grad(tw.ptr, req_grad);

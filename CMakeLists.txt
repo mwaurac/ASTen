@@ -32,6 +32,7 @@ add_library(c10 STATIC ${C10_SOURCES})
 # aten library ie ops
 set(ATEN_SOURCES
         aten/native/view_ops.c
+        aten/native/ops.c
 )
 add_library(aten STATIC ${ATEN_SOURCES})
 target_link_libraries(aten c10)
