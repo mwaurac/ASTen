@@ -68,18 +68,22 @@ Tensor* tensor_ones(size_t *shape, size_t ndim, DType dtype, Device device) {
             case DTYPE_FLOAT32: {
                 float* ptr = (float*)data;
                 for (size_t i = 0; i < numel; i++) ptr[i] = 1.0f;
+                break;
             }
             case DTYPE_FLOAT64: {
-                float* ptr = (float*)data;
+                double* ptr = (double*)data;
                 for (size_t i = 0; i < numel; i++) ptr[i] = 1.0;
+                break;
             }
             case DTYPE_INT32: {
                 int32_t* ptr = (int32_t*)data;
                 for (size_t i = 0; i < numel; i++) ptr[i] = 1;
+                break;
             }
             case DTYPE_INT64: {
                 int64_t* ptr = (int64_t*)data;
                 for (size_t i = 0; i < numel; i++) ptr[i] = 1;
+                break;
             }
             default: break;
         }

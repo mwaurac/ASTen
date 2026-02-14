@@ -112,18 +112,18 @@ PYBIND11_MODULE(_C, m) {
 
         .def("numpy", &tensor_to_numpy)
 
-        .def("reshape", [](const TensorWrapper& tw, std::vector<size_t> shape) {
+        .def("reshape", [](TensorWrapper& tw, std::vector<size_t> shape) {
             return new TensorWrapper(tensor_reshape(tw.ptr, shape.data(), shape.size()));
         })
-        .def("view", [](const TensorWrapper& tw, std::vector<size_t> shape) {
+        .def("view", [](TensorWrapper& tw, std::vector<size_t> shape) {
             return new TensorWrapper(tensor_view(tw.ptr, shape.data(), shape.size()));
         })
-        .def("permute", [](const TensorWrapper& tw, std::vector<size_t> dims) {
+        .def("permute", [](TensorWrapper& tw, std::vector<size_t> dims) {
             return new TensorWrapper(tensor_permute(tw.ptr, dims.data(), dims.size()));
         })
         
         // Operations
-        .def("add", [](const TensorWrapper& a, const TensorWrapper& b) {
+        .def("add", [](TensorWrapper& a, TensorWrapper& b) {
             return new TensorWrapper(tensor_add(a.ptr, b.ptr));
         })
 

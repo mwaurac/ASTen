@@ -88,6 +88,9 @@ Tensor* tensor_contiguous(Tensor* self) {
             indices[d] = 0;
         }
     }
+
+    free(indices);
+    return result;
 }
 
 Tensor* tensor_reshape(Tensor* self, size_t* new_shape, size_t new_ndim) {
